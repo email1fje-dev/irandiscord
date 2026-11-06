@@ -101,8 +101,8 @@ function applyAudio() {
 function updateVoiceUi() { renderSide(); if ($('#vgrid')) { renderVoiceGrid(); renderVoiceControls(); } }
 
 function voiceViewHtml(ch) {
-  return `<header class="main-head"><button class="icon-btn only-mobile" data-act="panel" data-p="nav">☰</button><h2>🔊 ${esc(ch.name)}</h2><div class="grow"></div>
-    <button class="icon-btn only-desktop" data-act="toggle-members">👥</button></header>
+  return `<header class="main-head"><button class="icon-btn only-mobile" data-act="panel" data-p="nav">${ico('menu')}</button><h2>${ico('volume')} ${esc(ch.name)}</h2><div class="grow"></div>
+    <button class="icon-btn only-desktop" data-act="toggle-members">${ico('users')}</button></header>
     <div class="voice-room"><div id="vgrid" class="vgrid"></div><div id="vctl" class="vctl"></div></div>`;
 }
 function renderVoiceGrid() {
@@ -114,7 +114,7 @@ function renderVoiceGrid() {
     const sp = V.an.get(p.socketId); 
     return `<div class="vtile${vid ? ' has-video' : ''}${sp && sp.on ? ' speaking' : ''}" data-vu="${p.socketId}" data-sid="${p.socketId}">
       <video autoplay playsinline muted></video><div class="vav">${avatar(u, 'av-xl')}</div>
-      <div class="vname">${p.muted || p.deafened ? '🔇 ' : ''}${p.deafened ? '🎧✕ ' : ''}${p.screen ? '🖥 ' : ''}${esc(u.display_name)}${vtick(u)}${p.socketId === (S.socket && S.socket.id) ? ' (شما)' : ''}</div></div>`;
+      <div class="vname">${p.muted || p.deafened ? ico('mic-off') + ' ' : ''}${p.deafened ? ico('headphones-off') + ' ' : ''}${p.screen ? ico('monitor') + ' ' : ''}${esc(u.display_name)}${vtick(u)}${p.socketId === (S.socket && S.socket.id) ? ' (شما)' : ''}</div></div>`;
   }).join('');
   bindTiles();
 }
@@ -129,12 +129,12 @@ function bindTiles() {
 function renderVoiceControls() {
   const el = $('#vctl'); if (!el) return;
   const cid = S.cur.channelId;
-  if (V.channelId !== cid) { el.innerHTML = `<button class="btn primary big" data-act="v-join" data-id="${cid}">🔊 اتصال به کانال صوتی</button>`; return; }
-  el.innerHTML = `<button class="vbtn${VM.muted ? ' off' : ''}" data-act="v-mute" title="میکروفون">${VM.muted ? '🔇' : '🎤'}</button>
-    <button class="vbtn${VM.deafened ? ' off' : ''}" data-act="v-deaf" title="ناشنوا شدن">${VM.deafened ? '🔕' : '🎧'}</button>
-    <button class="vbtn${V.cam ? ' on' : ''}" data-act="v-cam" title="دوربین">📷</button>
-    ${hasDisplayMedia() ? `<button class="vbtn${V.screen ? ' on' : ''}" data-act="v-screen" title="اشتراک صفحه">🖥</button>` : ''}
-    <button class="vbtn danger" data-act="v-leave" title="قطع تماس">📞</button>`;
+  if (V.channelId !== cid) { el.innerHTML = `<button class="btn primary big" data-act="v-join" data-id="${cid}">${ico('volume')} اتصال به کانال صوتی</button>`; return; }
+  el.innerHTML = `<button class="vbtn${VM.muted ? ' off' : ''}" data-act="v-mute" title="میکروفون">${ico(VM.muted ? 'mic-off' : 'mic')}</button>
+    <button class="vbtn${VM.deafened ? ' off' : ''}" data-act="v-deaf" title="ناشنوا شدن">${ico(VM.deafened ? 'headphones-off' : 'headphones')}</button>
+    <button class="vbtn${V.cam ? ' on' : ''}" data-act="v-cam" title="دوربین">${ico('camera')}</button>
+    ${hasDisplayMedia() ? `<button class="vbtn${V.screen ? ' on' : ''}" data-act="v-screen" title="اشتراک صفحه">${ico('monitor')}</button>` : ''}
+    <button class="vbtn danger" data-act="v-leave" title="قطع تماس">${ico('phone')}</button>`;
 }
 function watchLevel(id, stream) { // speaking indicator
   try {
