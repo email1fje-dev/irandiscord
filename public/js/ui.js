@@ -18,7 +18,8 @@ function renderRail() {
 function userPanel() {
   const vc = V.channelId && findChannel(V.channelId);
   return `${vc ? `<div class="voice-bar"><span>${ico('volume')} متصل به <b>${esc(vc.name)}</b></span><button class="icon-btn" data-act="v-leave" title="قطع">${ico('phone')}</button></div>` : ''}
-    <div class="user-panel"><button class="up-user" data-act="pres-menu">${avatar(S.me, 'av-m')}${dot(S.me.presence)}<span><b>${esc(S.me.display_name)}${vtick(S.me)}</b><small>${esc(S.me.status_text || PRESENCE_FA[S.me.presence])}</small></span></button>
+    <div class="user-panel"><button class="icon-btn mobile-nav-trigger" data-act="mobile-nav" title="دسترسی به بخش‌ها">${ico('menu')}</button>
+    <button class="up-user" data-act="pres-menu">${avatar(S.me, 'av-m')}${dot(S.me.presence)}<span><b>${esc(S.me.display_name)}${vtick(S.me)}</b><small>${esc(S.me.status_text || PRESENCE_FA[S.me.presence])}</small></span></button>
     <button class="icon-btn${VM.muted ? ' off' : ''}" data-act="v-mute" title="میکروفون">${ico(VM.muted ? 'mic-off' : 'mic')}</button>
     <button class="icon-btn${VM.deafened ? ' off' : ''}" data-act="v-deaf" title="ناشنوا">${ico(VM.deafened ? 'headphones-off' : 'headphones')}</button>
     <button class="icon-btn" data-act="settings" title="تنظیمات">${ico('settings')}</button></div>`;
@@ -127,6 +128,7 @@ ACT.friends = () => { S.cur.view = 'friends'; S.cur.channelId = null; renderAll(
 ACT.ftab = el => { friendsTab = el.dataset.t; renderMain(); };
 ACT['friend-send'] = guard(async () => { const i = $('#fr-name'); if (!i.value.trim()) return; await post('/api/friends/request', { username: i.value }); i.value = ''; toast('درخواست ارسال شد'); await reloadSocial(); renderAll(); });
 ACT.panel = el => setPanel(el.dataset.p);
+ACT['mobile-nav'] = el => pop(el, '<button data-act="panel" data-p="nav">'+ico('menu')+' کانال‌ها</button><button data-act="panel" data-p="chat">'+ico('message')+' گفتگوها</button><button data-act="panel" data-p="members">'+ico('users')+' اعضا</button><button data-act="settings">'+ico('settings')+' تنظیمات</button>', 'menu');
 ACT['toggle-members'] = () => document.body.classList.toggle('no-members');
 ACT['cat-toggle'] = el => { const id = +el.dataset.id; collapsed.has(id) ? collapsed.delete(id) : collapsed.add(id); localStorage.setItem('nv_collapsed', JSON.stringify([...collapsed])); renderSide(); };
 ACT['pres-menu'] = el => pop(el, ['online', 'idle', 'dnd', 'offline'].map(p => `<button data-act="pres-set" data-p="${p}">${dot(p)} ${PRESENCE_FA[p]}</button>`).join('') + '<button data-act="settings">' + ico('settings') + ' تنظیمات</button>', 'menu');
