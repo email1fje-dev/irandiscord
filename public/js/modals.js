@@ -10,7 +10,7 @@ function tabbed(title, tabs, opts) {
   const m = modal(title, '<div class="tabs"></div><div class="tab-body"></div>', opts);
   m.draw = () => {
     $('.tabs', m).innerHTML = tabs.map(t => `<button class="${t.id === cur ? 'on' : ''}" data-tab="${t.id}">${t.label}</button>`).join('');
-    const t = tabs.find(x => x.id === cur), b = $('.tab-body', m); b.innerHTML = t.html(); if (t.mount) t.mount(b, m);
+    const t = tabs.find(x => x.id === cur), b = $('.tab-body', m); b.innerHTML = t.html(); mountSelects(b); if (t.mount) t.mount(b, m);
   };
   m.addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) { cur = b.dataset.tab; m.draw(); } });
   m.draw(); return m;
@@ -21,7 +21,7 @@ const field = (label, inner) => `<label class="field"><span>${label}</span>${inn
 let settingsModal;
 ACT.settings = () => {
   closePop();
-  settingsModal = tabbed('تنظیمات کاربر', [
+  settingsModal = tabbed('تنظیمات Nava', [
     { id: 'acc', label: 'حساب', html: () => `
       <div class="row">${avatar(S.me, 'av-xl')}<div><button class="btn" data-act="avatar-pick">تغییر تصویر</button>${S.me.avatar ? ' <button class="btn ghost" data-act="avatar-del">حذف</button>' : ''}<input type="file" id="avatar-in" accept="image/*" hidden data-change="avatar"></div></div>
       ${field('نام نمایشی', `<input id="s-name" maxlength="32" value="${esc(S.me.display_name)}">`)}
