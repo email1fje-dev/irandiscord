@@ -41,7 +41,7 @@ function msgEl(m, prev) {
       ${(m.attachments || []).map(attHtml).join('')}
       <div class="reactions">${reactionsHtml(m)}</div>
     </div>
-    <div class="msg-tools"><button class="icon-btn" data-act="react-pick" data-id="${m.id}" title="واکنش">${ico('message')}</button><button class="icon-btn" data-act="msgmenu" data-id="${m.id}" title="بیشتر">⋯</button></div>
+    <div class="msg-tools"><button class="icon-btn" data-act="msgmenu" data-id="${m.id}" title="بیشتر">⋯</button></div>
   </article>`;
 }
 function renderMsgList(mode) {
