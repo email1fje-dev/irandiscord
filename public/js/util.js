@@ -83,6 +83,7 @@ function modal(title, html, opts = {}) {
   el.addEventListener('click', e => { if ((e.target === el && el._down) || e.target.closest('[data-close]')) el.close(); });
   el.close = () => { if (el._closing) return; el._closing = true; el.classList.add('closing'); opts.onClose && opts.onClose(); setTimeout(() => el.remove(), 160); };
   $('#modal-root').appendChild(el);
+  mountSelects(el);
   return el;
 }
 const closeModals = () => $$('.modal-back').forEach(m => m.close());
@@ -100,6 +101,50 @@ function pop(anchor, html, cls = '') {
   return el;
 }
 function closePop() { $$('#pop-root .pop').forEach(p => { document.removeEventListener('mousedown', p._outside, true); p.remove(); }); }
+
+
+/* Nava custom select: never open the browser/Android native option sheet. */
+function refreshCustomSelect(sel) {
+  if (!sel || !sel._navaSelect) return;
+  const box = sel._navaSelect;
+  const label = box.querySelector('.nava-select-value');
+  const chosen = sel.options[sel.selectedIndex];
+  label.textContent = chosen ? chosen.textContent : 'انتخاب کنید';
+  const menu = box.querySelector('.nava-select-menu');
+  menu.innerHTML = Array.from(sel.options).map((o, i) =>
+    '<button type="button" class="nava-select-option' + (o.selected ? ' selected' : '') +
+    '" data-index="' + i + '">' + esc(o.textContent) + (o.selected ? '<span class="nava-select-check">✓</span>' : '') + '</button>'
+  ).join('');
+}
+function mountSelects(root) {
+  (root || document).querySelectorAll('select:not([data-native])').forEach(sel => {
+    if (sel._navaSelect) { refreshCustomSelect(sel); return; }
+    const box = document.createElement('div');
+    box.className = 'nava-select';
+    box.innerHTML = '<button type="button" class="nava-select-trigger" aria-haspopup="listbox" aria-expanded="false"><span class="nava-select-value"></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button><div class="nava-select-menu" role="listbox" hidden></div>';
+    sel.classList.add('nava-native-select');
+    sel.insertAdjacentElement('afterend', box);
+    sel._navaSelect = box;
+    box.querySelector('.nava-select-trigger').addEventListener('click', () => {
+      const open = !box.classList.contains('open');
+      document.querySelectorAll('.nava-select.open').forEach(x => { x.classList.remove('open'); x.querySelector('.nava-select-menu').hidden = true; x.querySelector('.nava-select-trigger').setAttribute('aria-expanded','false'); });
+      box.classList.toggle('open', open);
+      box.querySelector('.nava-select-menu').hidden = !open;
+      box.querySelector('.nava-select-trigger').setAttribute('aria-expanded', String(open));
+    });
+    box.querySelector('.nava-select-menu').addEventListener('click', e => {
+      const option = e.target.closest('[data-index]');
+      if (!option) return;
+      sel.selectedIndex = Number(option.dataset.index);
+      sel.dispatchEvent(new Event('change', { bubbles: true }));
+      refreshCustomSelect(sel);
+      box.classList.remove('open');
+      box.querySelector('.nava-select-menu').hidden = true;
+      box.querySelector('.nava-select-trigger').setAttribute('aria-expanded','false');
+    });
+    refreshCustomSelect(sel);
+  });
+}
 
 // ---------- sounds (synthesized, no asset files) ----------
 let _ac;
