@@ -12,7 +12,7 @@ function renderRail() {
   $('#rail').innerHTML = `<button class="rail-btn logo${S.cur.mode === 'home' ? ' on' : ''}" data-act="home" title="خانه">${LOGO}${badge(dmU.c, dmU.m)}</button><div class="rail-sep"></div>` +
     S.servers.map(s => { const u = unreadOfServer(s.id);
       return `<button class="rail-btn${S.cur.serverId === s.id ? ' on' : ''}" data-act="srv" data-id="${s.id}" title="${esc(s.name)}${s.verified ? ' ✔' : ''}">${s.icon ? `<img src="${esc(s.icon)}" alt="">` : `<span>${esc(Array.from(s.name)[0])}</span>`}${badge(u.c, u.m)}</button>`; }).join('') +
-    `<button class="rail-btn add" data-act="server-new" title="ساخت یا پیوستن به سرور">＋</button>`;
+    `<button class="rail-btn add" data-act="server-new" title="ساخت سرور">＋</button><button class="rail-btn discover" data-act="server-discover" title="سرورهای برتر">${ico('trophy')}</button>`;
 }
 
 function userPanel() {
