@@ -182,3 +182,5 @@ body.no-members #members,body.members-empty #members{display:none}
   #side{inset-inline-start:auto;inset-inline-end:auto;left:68px;right:0}
   body[data-panel=nav] #rail,body[data-panel=nav] #side,body[data-panel=chat] #main,body[data-panel=members] #members{animation-name:panelIn}
 }
+
+.ui-icon{width:1.15em;height:1.15em;display:inline-block;vertical-align:-.2em;flex:0 0 auto}.icon-btn .ui-icon,.vbtn .ui-icon{width:20px;height:20px}#bottom button .ui-icon{width:21px;height:21px}.up-user b{display:inline-flex;align-items:center;white-space:nowrap;gap:4px}
