@@ -2,6 +2,7 @@
 // ---------- layout rendering + navigation + global event wiring ----------
 const collapsed = new Set(JSON.parse(localStorage.getItem('nv_collapsed') || '[]'));
 let friendsTab = 'online';
+let discoveryReturn = null;
 const setPanel = p => { document.body.dataset.panel = p; };
 
 function renderAll(o) { renderRail(); renderSide(); if (!(o && o.keepMain)) renderMain(); renderMembers(); }
@@ -12,7 +13,7 @@ function renderRail() {
   $('#rail').innerHTML = `<button class="rail-btn logo${S.cur.mode === 'home' ? ' on' : ''}" data-act="home" title="خانه">${LOGO}${badge(dmU.c, dmU.m)}</button><div class="rail-sep"></div>` +
     S.servers.map(s => { const u = unreadOfServer(s.id);
       return `<button class="rail-btn${S.cur.serverId === s.id ? ' on' : ''}" data-act="srv" data-id="${s.id}" title="${esc(s.name)}${s.verified ? ' ✔' : ''}">${s.icon ? `<img src="${esc(s.icon)}" alt="">` : `<span>${esc(Array.from(s.name)[0])}</span>`}${badge(u.c, u.m)}</button>`; }).join('') +
-    `<button class="rail-btn add" data-act="server-new" title="ساخت سرور">＋</button><button class="rail-btn discover" data-act="server-discover" title="سرورهای برتر">${ico('trophy')}</button>`;
+    `<button class="rail-btn add" data-act="server-new" title="ساخت سرور">＋</button><button class="rail-btn discover${S.cur.mode === 'discover' ? ' on' : ''}" data-act="server-discover" title="Discovery">${ico('compass')}</button>`;
 }
 
 function userPanel() {
@@ -73,11 +74,34 @@ function renderMembers() {
 // ----- main area -----
 function renderMain() {
   const m = $('#main'), cur = S.cur;
+  if (cur.mode === 'discover') { renderDiscovery(); return; }
   if (cur.mode === 'home' && cur.view === 'friends') { m.innerHTML = friendsHtml(); const i = $('#fr-name'); if (i) i.addEventListener('keydown', e => { if (e.key === 'Enter') ACT['friend-send'](); }); return; }
   const ch = cur.channelId && findChannel(cur.channelId);
   if (!ch) { m.innerHTML = `<header class="main-head"><button class="icon-btn only-mobile" data-act="panel" data-p="nav">${ico('menu')}</button><h2>${esc(window.APP_NAME)}</h2></header><div class="empty">${LOGO}<p>یک کانال را انتخاب کنید یا کانال جدیدی بسازید.</p></div>`; return; }
   if (ch.type === 'voice') { m.innerHTML = voiceViewHtml(ch); renderVoiceGrid(); renderVoiceControls(); return; }
   const dm = !ch.server_id; m.innerHTML = chatViewHtml(ch, dm ? dmTitle(ch) : ch.name, dm); mountChat(ch.id);
+}
+async function renderDiscovery() {
+  const m = $('#main');
+  m.innerHTML = `<header class="main-head discovery-head"><button class="icon-btn" data-act="discover-back" title="بازگشت">${ico('arrow-left')}</button><h2>Discovery</h2></header><div class="discovery-page"><section class="discovery-intro"><span class="discovery-eyebrow">${ico('compass')} NAVA DISCOVER</span><h1>جامعه‌ی خودت رو پیدا کن</h1><p>سرورهای مختلف رو کشف کن، پیش‌نمایش بگیر و به جمع‌های موردعلاقه‌ات بپیوند.</p><div class="discovery-search">${ico('search')}<input id="discover-search" placeholder="جستجوی سرورها..." autocomplete="off"></div></section><div class="discovery-toolbar"><h2>سرورهای پیشنهادی</h2><span class="muted" id="discover-count">در حال بارگذاری…</span></div><div class="discover-grid" id="discover-grid"><div class="discover-loading">در حال دریافت سرورها…</div></div></div>`;
+  const grid = $('#discover-grid');
+  try {
+    const r = await get('/api/servers/discover');
+    if (!m.isConnected || S.cur.mode !== 'discover') return;
+    const list = r.servers || [];
+    const draw = q => {
+      const filtered = list.filter(s => !q || s.name.toLowerCase().includes(q.toLowerCase()));
+      $('#discover-count').textContent = fa(filtered.length) + ' سرور';
+      grid.innerHTML = filtered.length ? filtered.map((s,i) => `<article class="discover-card">
+        <div class="discover-banner banner-${i%5}"><span class="discover-banner-mark">${ico('sparkles')}</span></div>
+        <div class="discover-card-content"><div class="discover-card-identity">${s.icon ? `<img class="discover-logo" src="${esc(s.icon)}" alt="">` : `<div class="discover-logo fallback">${esc(Array.from(s.name)[0]||'?')}</div>`}<div class="discover-title-row"><h3>${esc(s.name)} ${s.verified ? vtick(s) : ''}</h3><span class="discover-rank">#${fa(i+1)}</span></div></div>
+        <div class="discover-stats"><span>${ico('activity')}<b>${fa(s.online_count)}</b> آنلاین</span><span>${ico('users')}<b>${fa(s.member_count)}</b> عضو</span></div>
+        <button class="btn primary discover-preview" data-act="discover-preview" data-id="${s.id}">${ico('eye')} پیش‌نمایش</button></div></article>`).join('') : '<div class="empty discover-empty">'+ico('users')+'<p>سروری با این نام پیدا نشد.</p></div>';
+    };
+    draw('');
+    const input=$('#discover-search');
+    input.addEventListener('input',()=>draw(input.value.trim()));
+  } catch(e) { if (m.isConnected) grid.innerHTML='<div class="empty discover-empty">'+ico('alert-circle')+'<p>دریافت سرورها ناموفق بود. دوباره تلاش کن.</p><button class="btn" data-act="server-discover">تلاش مجدد</button></div>'; }
 }
 function friendsHtml() {
   const f = S.social, tabs = [['online', 'آنلاین'], ['all', 'همه'], ['pending', `در انتظار${f.incoming.length ? ' (' + fa(f.incoming.length) + ')' : ''}`], ['blocked', 'مسدود'], ['add', 'افزودن دوست']];
@@ -121,6 +145,7 @@ async function openDmWith(uid) {
 
 // ----- actions -----
 ACT.home = () => goHome();
+ACT['discover-back'] = () => { S.cur = discoveryReturn || {mode:'home',serverId:null,channelId:null,view:'friends'}; discoveryReturn = null; renderAll(); setPanel(S.cur.channelId ? 'chat' : 'nav'); };
 ACT.srv = guard(async el => { await openServer(+el.dataset.id); setPanel('nav'); });
 ACT.chan = el => { openChannel(+el.dataset.id); const ch = findChannel(+el.dataset.id); if (ch && ch.type === 'voice' && V.channelId !== ch.id) voiceJoin(ch.id); };
 ACT.dm = el => openDm(+el.dataset.id);
