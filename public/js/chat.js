@@ -32,11 +32,11 @@ function msgEl(m, prev) {
   const cont = prev && prev.author_id === m.author_id && dayKey(prev.created_at) === dayKey(m.created_at) &&
     (new Date(m.created_at) - new Date(prev.created_at)) < 300000 && !m.reply_to;
   const col = S.cur.serverId ? roleColorOf(S.cur.serverId, m.author_id) : '';
-  const reply = m.reply ? `<div class="reply" data-act="jump" data-id="${m.reply.id}">↩ <b>${esc(m.reply.author_name)}</b> ${esc(m.reply.content || '📎')}</div>` : '';
+  const reply = m.reply ? `<div class="reply" data-act="jump" data-id="${m.reply.id}">↩ <b>${esc(m.reply.author_name)}</b> ${esc(m.reply.content || 'فایل')}</div>` : '';
   return `<article class="msg${cont ? ' cont' : ''}${hasMention(m) ? ' mentioned' : ''}${m.pinned ? ' pinned' : ''}" data-mid="${m.id}" data-uid="${m.author_id}">
     <div class="msg-av" data-act="profile" data-uid="${m.author_id}">${cont ? '' : avatar(a, 'av-m')}</div>
     <div class="msg-main">${reply}
-      ${cont ? '' : `<div class="msg-head"><b class="msg-name" data-act="profile" data-uid="${m.author_id}" style="${col ? 'color:' + esc(col) : ''}">${esc(a.display_name)}</b>${vtick(a)}<time title="${esc(jStamp(m.created_at))}">${jTime(m.created_at)}</time>${m.pinned ? '<span class="pin-ic" title="پین‌شده">📌</span>' : ''}</div>`}
+      ${cont ? '' : `<div class="msg-head"><b class="msg-name" data-act="profile" data-uid="${m.author_id}" style="${col ? 'color:' + esc(col) : ''}">${esc(a.display_name)}</b>${vtick(a)}<time title="${esc(jStamp(m.created_at))}">${jTime(m.created_at)}</time>${m.pinned ? `<span class="pin-ic" title="پین‌شده">${ico('pin')}</span>` : ''}</div>`}
       <div class="msg-body">${m.content ? md(m.content, mdCtx()) : ''}${m.edited_at ? '<small class="edited"> (ویرایش شده)</small>' : ''}</div>
       ${(m.attachments || []).map(attHtml).join('')}
       <div class="reactions">${reactionsHtml(m)}</div>
@@ -98,7 +98,7 @@ function notifyMessage(m) {
   if (!S.me || S.me.presence === 'dnd') return;
   if (prefs.sound) beep(SOUNDS.msg);
   if (prefs.desktop && 'Notification' in window && Notification.permission === 'granted' && document.hidden) {
-    try { new Notification(m.author.display_name, { body: (m.content || '📎 فایل').replace(/<@\d+>/g, '@').slice(0, 120), icon: m.author.avatar || undefined }); } catch (_) {}
+    try { new Notification(m.author.display_name, { body: (m.content || 'فایل').replace(/<@\d+>/g, '@').slice(0, 120), icon: m.author.avatar || undefined }); } catch (_) {}
   }
 }
 function markRead(cid, lastId) {
@@ -147,7 +147,7 @@ function chatViewHtml(ch, title, isDm) {
       <textarea id="msg-in" rows="1" maxlength="4000" placeholder="پیام خود را بنویسید…"></textarea>
       
       <button class="send" data-act="send" title="ارسال">➤</button></div>`;
-  return `<header class="main-head"><button class="icon-btn only-mobile" data-act="panel" data-p="nav">☰</button>
+  return `<header class="main-head"><button class="icon-btn only-mobile" data-act="panel" data-p="nav">${ico('menu')}</button>
     <h2>${isDm ? '' : '<span class="hash">#</span>'}${esc(title)}</h2><div class="grow"></div>
     <div class="search-box" hidden><input id="search-in" type="search" placeholder="جستجو در پیام‌ها…"></div>
     <button class="icon-btn" data-act="search-toggle" title="جستجو">${ico('search')}</button>
@@ -251,7 +251,7 @@ ACT.msgmenu = el => {
   pop(el, b('reply', '↩ پاسخ') + (m.content ? b('copy', '⧉ کپی متن') : '') + (mine ? b('edit', '✎ ویرایش') : '') +
     (mod ? b('pin', m.pinned ? ico('pin') + ' برداشتن پین' : ico('pin') + ' پین کردن') : '') + (mine || (S.cur.mode === 'server' && mod) ? b('delmsg', ico('trash') + ' حذف', 'danger') : ''), 'menu');
 };
-ACT.reply = el => { const m = findMsg(+el.dataset.id); if (!m) return; chatOf(S.cur.channelId).reply = { id: m.id, name: nameOf(m.author_id) || m.author.display_name, content: (m.content || '📎').replace(/<@\d+>/g, '@').slice(0, 80) }; renderReplyBar(); const ta = $('#msg-in'); ta && ta.focus(); };
+ACT.reply = el => { const m = findMsg(+el.dataset.id); if (!m) return; chatOf(S.cur.channelId).reply = { id: m.id, name: nameOf(m.author_id) || m.author.display_name, content: (m.content || 'فایل').replace(/<@\d+>/g, '@').slice(0, 80) }; renderReplyBar(); const ta = $('#msg-in'); ta && ta.focus(); };
 ACT.copy = el => { const m = findMsg(+el.dataset.id); navigator.clipboard && navigator.clipboard.writeText(m.content).then(() => toast('کپی شد')); };
 ACT.pin = guard(async el => { const m = findMsg(+el.dataset.id); const r = await ack('msg:pin', { id: m.id, pinned: !m.pinned }); if (!r.ok) toast(r.error, 'err'); });
 ACT.delmsg = guard(async el => { if (!confirm('این پیام حذف شود؟')) return; const r = await ack('msg:delete', { id: +el.dataset.id }); if (!r.ok) toast(r.error, 'err'); });
