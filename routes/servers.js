@@ -30,6 +30,20 @@ async function deleteServer(id) {
 }
 
 // ---- servers ----
+// Public server discovery: rank by verified status, then community size.
+router.get('/servers/discover', wrap(async (req, res) => {
+  const rows = await all(`SELECT s.id, s.name, s.icon, s.verified,
+      (SELECT count(*)::int FROM members m WHERE m.server_id=s.id) AS member_count,
+      (SELECT count(*)::int FROM members m JOIN users u ON u.id=m.user_id WHERE m.server_id=s.id AND u.presence='online') AS online_count
+    FROM servers s
+    WHERE s.owner_id <> $1
+      AND NOT EXISTS (SELECT 1 FROM members mine WHERE mine.server_id=s.id AND mine.user_id=$1)
+      AND NOT EXISTS (SELECT 1 FROM bans b WHERE b.server_id=s.id AND b.user_id=$1)
+    ORDER BY s.verified DESC, member_count DESC, s.created_at DESC
+    LIMIT 30`, [req.user.id]);
+  res.json({ servers: rows });
+}));
+
 router.post('/servers', wrap(async (req, res) => {
   const name = clean((req.body || {}).name, 60);
   if (!name) throw bad('نام سرور را وارد کنید');
@@ -77,6 +91,18 @@ router.delete('/servers/:id', wrap(async (req, res) => {
   const id = int(req.params.id); const info = await need(id, req.user.id);
   if (!info.owner) throw forbidden('فقط مالک سرور می‌تواند آن را حذف کند');
   await deleteServer(id); res.json({ ok: true });
+}));
+
+router.post('/servers/:id/join', wrap(async (req, res) => {
+  const sid = int(req.params.id), uid = req.user.id;
+  if (await one('SELECT 1 FROM bans WHERE server_id=$1 AND user_id=$2', [sid, uid])) throw forbidden('شما از این سرور مسدود شده‌اید');
+  const server = await one('SELECT id FROM servers WHERE id=$1', [sid]);
+  if (!server) throw notFound('سرور پیدا نشد');
+  await q('INSERT INTO members(server_id,user_id) VALUES($1,$2) ON CONFLICT DO NOTHING', [sid, uid]);
+  bus.io.in('user:' + uid).socketsJoin('server:' + sid);
+  bus.toUser(uid, 'servers:refresh', {});
+  changed(sid);
+  res.json({ server_id: sid });
 }));
 
 router.post('/servers/:id/leave', wrap(async (req, res) => {
