@@ -69,6 +69,27 @@ ACT['pw-save'] = guard(async () => { await patch('/api/me', { current_password: 
 ACT.logout = () => logout();
 
 // ----- create / join server, invites -----
+ACT['server-discover'] = guard(async () => {
+  const m = modal('سرورهای برتر', '<div class="discover-loading">در حال دریافت سرورها…</div>', { cls: 'wide' });
+  const r = await get('/api/servers/discover');
+  if (!m.isConnected) return;
+  const list = r.servers || [];
+  m.querySelector('.modal-body').innerHTML = list.length ? '<div class="discover-grid">' + list.map((s, i) =>
+    '<article class="discover-card"><div class="discover-card-top">' +
+    (s.icon ? '<img class="discover-icon" src="' + esc(s.icon) + '" alt="">' : '<div class="discover-icon fallback">' + esc(Array.from(s.name)[0] || '?') + '</div>') +
+    '<div class="discover-info"><b>' + esc(s.name) + (s.verified ? ' ' + vtick(s) : '') + '</b><small>' + fa(s.member_count) + ' عضو · ' + fa(s.online_count) + ' آنلاین</small></div>' +
+    (i < 3 ? '<span class="discover-rank">' + fa(i + 1) + '</span>' : '') + '</div>' +
+    '<button class="btn primary discover-join" data-act="discover-join" data-id="' + s.id + '">' + ico('plus') + ' پیوستن به سرور</button></article>'
+  ).join('') + '</div>' : '<div class="empty discover-empty">' + ico('users') + '<p>فعلاً سرور عمومی‌ای برای نمایش وجود ندارد.</p><small>بعداً دوباره سر بزن.</small></div>';
+});
+ACT['discover-join'] = guard(async el => {
+  const id = +el.dataset.id;
+  el.disabled = true; el.textContent = 'در حال پیوستن…';
+  const r = await post('/api/servers/' + id + '/join');
+  closeModals(); await loadBootstrap(); await loadServer(r.server_id, true); openServer(r.server_id);
+  toast('با موفقیت به سرور پیوستید');
+});
+
 ACT['server-new'] = () => modal('ساخت سرور', `${field('نام سرور', '<input id="n-name" maxlength="60" placeholder="مثلاً: دورهمی ما">')}<button class="btn primary" data-act="server-create">ساختن</button><hr><p class="muted">دعوت‌نامه دارید؟</p><button class="btn" data-act="server-join-open">پیوستن به سرور</button>`);
 ACT['server-create'] = guard(async () => {
   const r = await post('/api/servers', { name: val('n-name') }); closeModals();
