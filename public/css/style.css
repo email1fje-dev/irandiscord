@@ -184,3 +184,17 @@ body.no-members #members,body.members-empty #members{display:none}
 }
 
 .ui-icon{width:1.15em;height:1.15em;display:inline-block;vertical-align:-.2em;flex:0 0 auto}.icon-btn .ui-icon,.vbtn .ui-icon{width:20px;height:20px}#bottom button .ui-icon{width:21px;height:21px}.up-user b{display:inline-flex;align-items:center;white-space:nowrap;gap:4px}
+
+/* Nava-native custom dropdowns */
+select.nava-native-select{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important;padding:0!important;border:0!important;clip-path:inset(50%)!important}
+.nava-select{position:relative;width:100%;min-width:0}
+.nava-select-trigger{width:100%;min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 14px;background:var(--bg0);border:1px solid var(--line);border-radius:12px;color:var(--text);text-align:right;transition:border-color .16s,background .16s}
+.nava-select-trigger:focus-visible,.nava-select.open .nava-select-trigger{outline:none;border-color:var(--acc);background:var(--bg1)}
+.nava-select-trigger svg{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:2;transition:transform .16s}
+.nava-select.open .nava-select-trigger svg{transform:rotate(180deg)}
+.nava-select-menu{position:absolute;z-index:1000;top:calc(100% + 7px);right:0;left:0;max-height:min(260px,40vh);overflow:auto;padding:6px;background:var(--panel,var(--bg1));border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 36px #0008}
+.nava-select-menu[hidden]{display:none}
+.nava-select-option{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border-radius:9px;color:var(--text);background:transparent;text-align:right}
+.nava-select-option:hover,.nava-select-option.selected{background:var(--bg0)}
+.nava-select-option.selected{color:var(--acc);font-weight:700}
+.nava-select-check{color:var(--acc);font-weight:800}
