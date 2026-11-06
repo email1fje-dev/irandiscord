@@ -74,16 +74,6 @@ ACT['server-discover'] = () => {
   S.cur = { mode: 'discover', serverId: null, channelId: null, view: 'discover' };
   renderAll(); setPanel('chat');
 };
-/* Legacy modal discovery implementation replaced by the full-page Discovery view.
-ACT['server-discover'] = guard(async () => {
-  const m = modal('سرورهای برتر', '<div class="discover-loading">در حال دریافت سرورها…</div>', { cls: 'wide' });
-  const r = await get('/api/servers/discover');
-  if (!m.isConnected) return;
-  const list = r.servers || [];
-  m.querySelector('.modal-body').innerHTML = '<div class="discover-intro"><h2>سرورهای برتر</h2><p>جامعه‌های جذاب Nava را پیدا کن و قبل از عضویت پیش‌نمایششان را ببین.</p></div>' + (list.length ? '<div class="discover-grid">' + list.map((s, i) =>
-    '<article class="discover-card"><div class="discover-banner banner-' + (i % 5) + '">' + (s.icon ? '<img class="discover-logo" src="' + esc(s.icon) + '" alt="لوگوی ' + esc(s.name) + '">' : '<div class="discover-logo fallback">' + esc(Array.from(s.name)[0] || '?') + '</div>') + '</div><div class="discover-card-content"><div class="discover-title-row"><h3>' + esc(s.name) + (s.verified ? ' ' + vtick(s) : '') + '</h3>' + (i < 3 ? '<span class="discover-rank">#' + fa(i + 1) + '</span>' : '') + '</div><div class="discover-stats"><span>' + ico('activity') + fa(s.online_count) + ' آنلاین</span><span>' + ico('users') + fa(s.member_count) + ' عضو</span></div><button class="btn primary discover-preview" data-act="discover-preview" data-id="' + s.id + '">' + ico('eye') + ' پیش‌نمایش</button></div></article>'
-  ).join('') + '</div>' : '<div class="empty discover-empty">' + ico('users') + '<p>فعلاً سرور عمومی‌ای برای نمایش وجود ندارد.</p></div>');
-});
 ACT['discover-preview'] = guard(async el => {
   const id = +el.dataset.id, r = await get('/api/servers/discover');
   const s = (r.servers || []).find(x => x.id === id);
@@ -97,7 +87,6 @@ ACT['discover-join'] = guard(async el => {
   closeModals(); await loadBootstrap(); await loadServer(r.server_id, true); openServer(r.server_id);
   toast('با موفقیت به سرور پیوستید');
 });
-*/
 
 ACT['server-new'] = () => modal('ساخت سرور', `${field('نام سرور', '<input id="n-name" maxlength="60" placeholder="مثلاً: دورهمی ما">')}<button class="btn primary" data-act="server-create">ساختن</button><hr><p class="muted">دعوت‌نامه دارید؟</p><button class="btn" data-act="server-join-open">پیوستن به سرور</button>`);
 ACT['server-create'] = guard(async () => {
