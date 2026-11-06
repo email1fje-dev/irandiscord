@@ -17,10 +17,10 @@ function renderRail() {
 
 function userPanel() {
   const vc = V.channelId && findChannel(V.channelId);
-  return `${vc ? `<div class="voice-bar"><span>🔊 متصل به <b>${esc(vc.name)}</b></span><button class="icon-btn" data-act="v-leave" title="قطع">📞</button></div>` : ''}
+  return `${vc ? `<div class="voice-bar"><span>${ico('volume')} متصل به <b>${esc(vc.name)}</b></span><button class="icon-btn" data-act="v-leave" title="قطع">${ico('phone')}</button></div>` : ''}
     <div class="user-panel"><button class="up-user" data-act="pres-menu">${avatar(S.me, 'av-m')}${dot(S.me.presence)}<span><b>${esc(S.me.display_name)}${vtick(S.me)}</b><small>${esc(S.me.status_text || PRESENCE_FA[S.me.presence])}</small></span></button>
-    <button class="icon-btn${VM.muted ? ' off' : ''}" data-act="v-mute" title="میکروفون">${VM.muted ? '🔇' : '🎤'}</button>
-    <button class="icon-btn${VM.deafened ? ' off' : ''}" data-act="v-deaf" title="ناشنوا">${VM.deafened ? '🔕' : '🎧'}</button>
+    <button class="icon-btn${VM.muted ? ' off' : ''}" data-act="v-mute" title="میکروفون">${ico(VM.muted ? 'mic-off' : 'mic')}</button>
+    <button class="icon-btn${VM.deafened ? ' off' : ''}" data-act="v-deaf" title="ناشنوا">${ico(VM.deafened ? 'headphones-off' : 'headphones')}</button>
     <button class="icon-btn" data-act="settings" title="تنظیمات">⚙</button></div>`;
 }
 function renderSide() {
@@ -32,9 +32,9 @@ function renderSide() {
       const u = S.unread[c.id], on = S.cur.channelId === c.id;
       if (c.type === 'voice') {
         const parts = S.voice[c.id] || [];
-        return `<button class="ch${on ? ' on' : ''}" data-act="chan" data-id="${c.id}">🔊 <span>${esc(c.name)}</span></button>` +
+        return `<button class="ch${on ? ' on' : ''}" data-act="chan" data-id="${c.id}">${ico('volume')} <span>${esc(c.name)}</span></button>` +
           parts.map(p => { const x = userOf(p.userId) || { id: p.userId, display_name: 'کاربر' }; const sp = V.an.get(p.socketId);
-            return `<div class="vp${sp && sp.on ? ' speaking' : ''}" data-vu="${p.socketId}">${avatar(x, 'av-s')}<span>${esc(x.display_name)}</span>${p.muted || p.deafened ? '🔇' : ''}${p.video || p.screen ? '📹' : ''}</div>`; }).join('');
+            return `<div class="vp${sp && sp.on ? ' speaking' : ''}" data-vu="${p.socketId}">${avatar(x, 'av-s')}<span>${esc(x.display_name)}</span>${p.muted || p.deafened ? ico('mic-off') : ''}${p.video || p.screen ? ico('video') : ''}</div>`; }).join('');
       }
       return `<button class="ch${on ? ' on' : ''}${u ? ' unread' : ''}" data-act="chan" data-id="${c.id}"><span class="hash">#</span><span>${esc(c.name)}</span>${u ? badge(u.count, u.mentions) : ''}</button>`;
     };
@@ -44,7 +44,7 @@ function renderSide() {
       loose.map(item).join('') +
       cats.map(cat => `<div class="cat"><div class="cat-head"><button data-act="cat-toggle" data-id="${cat.id}">${collapsed.has(cat.id) ? '◂' : '▾'} ${esc(cat.name)}</button>${mg ? `<button class="icon-btn" data-act="ch-new" data-parent="${cat.id}" title="کانال جدید">＋</button>` : ''}</div>${collapsed.has(cat.id) ? '' : chs.filter(c => c.parent_id === cat.id).map(item).join('')}</div>`).join('') + '</div>';
   } else {
-    body = `<div class="side-head static"><b>پیام‌ها</b></div><div class="side-scroll"><button class="ch${S.cur.view === 'friends' ? ' on' : ''}" data-act="friends">👥 <span>دوستان</span>${S.social.incoming.length ? badge(0, S.social.incoming.length) : ''}</button>
+    body = `<div class="side-head static"><b>پیام‌ها</b></div><div class="side-scroll"><button class="ch${S.cur.view === 'friends' ? ' on' : ''}" data-act="friends"">${ico('users')} <span>دوستان</span>${S.social.incoming.length ? badge(0, S.social.incoming.length) : ''}</button>
       <div class="cat-head"><span class="muted">پیام‌های مستقیم</span><button class="icon-btn" data-act="group-new" title="گروه جدید">＋</button></div>` +
       S.dms.map(d => { const u = S.unread[d.id], o = d.type === 'dm' ? d.members.find(m => m.id !== S.me.id) : null;
         return `<button class="ch dm${S.cur.channelId === d.id ? ' on' : ''}${u ? ' unread' : ''}" data-act="dm" data-id="${d.id}">${o ? avatar(o, 'av-s') + dot(o.presence) : '<span class="av av-s grp">👥</span>'}<span>${esc(dmTitle(d))}${o ? vtick(o) : ''}</span>${u ? badge(u.count, u.mentions) : ''}</button>`; }).join('') + '</div>';
@@ -74,7 +74,7 @@ function renderMain() {
   const m = $('#main'), cur = S.cur;
   if (cur.mode === 'home' && cur.view === 'friends') { m.innerHTML = friendsHtml(); const i = $('#fr-name'); if (i) i.addEventListener('keydown', e => { if (e.key === 'Enter') ACT['friend-send'](); }); return; }
   const ch = cur.channelId && findChannel(cur.channelId);
-  if (!ch) { m.innerHTML = `<header class="main-head"><button class="icon-btn only-mobile" data-act="panel" data-p="nav">☰</button><h2>${esc(window.APP_NAME)}</h2></header><div class="empty">${LOGO}<p>یک کانال را انتخاب کنید یا کانال جدیدی بسازید.</p></div>`; return; }
+  if (!ch) { m.innerHTML = `<header class="main-head"><button class="icon-btn only-mobile" data-act="panel" data-p="nav">${ico('menu')}</button><h2>${esc(window.APP_NAME)}</h2></header><div class="empty">${LOGO}<p>یک کانال را انتخاب کنید یا کانال جدیدی بسازید.</p></div>`; return; }
   if (ch.type === 'voice') { m.innerHTML = voiceViewHtml(ch); renderVoiceGrid(); renderVoiceControls(); return; }
   const dm = !ch.server_id; m.innerHTML = chatViewHtml(ch, dm ? dmTitle(ch) : ch.name, dm); mountChat(ch.id);
 }
@@ -83,11 +83,11 @@ function friendsHtml() {
   const row = (u, btns) => `<div class="list-row">${avatar(u, 'av-m')}${dot(u.presence)}<span><b>${esc(u.display_name)}</b>${vtick(u)}<small class="muted"> @${esc(u.username)}</small></span><span class="grow"></span>${btns}</div>`;
   const b = (a, t, id, c = '') => `<button class="btn ${c}" data-act="${a}" data-uid="${id}">${t}</button>`;
   let list = '';
-  if (friendsTab === 'online' || friendsTab === 'all') { const l = f.friends.filter(u => friendsTab === 'all' || u.presence !== 'offline'); list = l.map(u => row(u, b('dm-open', '💬 پیام', u.id) + b('friend-rm', 'حذف', u.id, 'ghost'))).join('') || '<p class="muted center pad">موردی نیست.</p>'; }
+  if (friendsTab === 'online' || friendsTab === 'all') { const l = f.friends.filter(u => friendsTab === 'all' || u.presence !== 'offline'); list = l.map(u => row(u, b('dm-open', ico('message') + ' پیام', u.id) + b('friend-rm', 'حذف', u.id, 'ghost'))).join('') || '<p class="muted center pad">موردی نیست.</p>'; }
   else if (friendsTab === 'pending') list = f.incoming.map(u => row(u, b('friend-acc', '✓ بپذیر', u.id) + b('friend-dec', '✕ رد', u.id, 'ghost'))).join('') + f.outgoing.map(u => row(u, '<span class="muted">ارسال‌شده</span>' + b('friend-cancel', 'لغو', u.id, 'ghost'))).join('') || '<p class="muted center pad">درخواستی نیست.</p>';
   else if (friendsTab === 'blocked') list = f.blocked.map(u => row(u, b('unblock', 'رفع مسدودی', u.id))).join('') || '<p class="muted center pad">کسی مسدود نشده است.</p>';
   else list = `<div class="pad"><p>نام کاربری دوستتان را وارد کنید:</p><div class="row"><input id="fr-name" dir="ltr" placeholder="username"><button class="btn primary" data-act="friend-send">ارسال درخواست</button></div></div>`;
-  return `<header class="main-head"><button class="icon-btn only-mobile" data-act="panel" data-p="nav">☰</button><h2>👥 دوستان</h2><div class="tabs inline">${tabs.map(([k, t]) => `<button class="${friendsTab === k ? 'on' : ''}" data-act="ftab" data-t="${k}">${t}</button>`).join('')}</div></header><div class="friends">${list}</div>`;
+  return `<header class="main-head"><button class="icon-btn only-mobile" data-act="panel" data-p="nav">${ico('menu')}</button><h2>${ico('users')} دوستان</h2><div class="tabs inline">${tabs.map(([k, t]) => `<button class="${friendsTab === k ? 'on' : ''}" data-act="ftab" data-t="${k}">${t}</button>`).join('')}</div></header><div class="friends">${list}</div>`;
 }
 const refreshFriendsModal = () => { if (S.cur.mode === 'home' && S.cur.view === 'friends') renderMain(); };
 
