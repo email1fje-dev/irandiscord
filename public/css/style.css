@@ -232,3 +232,36 @@ select.nava-native-select{position:absolute!important;width:1px!important;height
 .discover-preview,.discover-preview-join{width:100%;min-height:48px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:16px}
 .discover-preview-panel{text-align:center}.discover-preview-panel .discover-banner{height:150px;border-radius:14px;margin-bottom:48px}.discover-preview-panel h2{margin:0 0 12px}.discover-preview-panel .discover-stats{justify-content:center;margin-bottom:18px}.discover-preview-panel p{margin:0 0 18px}
 @media(max-width:768px){.discover-grid{grid-template-columns:1fr}.discover-banner{height:118px}.discover-card-content{padding-inline:16px}}
+
+
+/* Nava custom settings workspace */
+.settings-modal{max-width:900px!important;width:min(900px,96vw)!important;min-height:min(620px,88dvh)}
+.settings-modal>header{padding:16px 20px;background:var(--bg1)}
+.settings-modal>header h3{font-size:18px;font-weight:800;letter-spacing:-.2px}
+.settings-modal>.modal-body{display:grid;grid-template-columns:190px minmax(0,1fr);gap:22px;padding:20px;min-height:0}
+.settings-modal .tabs{display:flex;flex-direction:column;align-items:stretch;gap:5px;border:0;border-inline-end:1px solid var(--line);margin:0;padding-inline-end:14px;overflow:visible}
+.settings-modal .tabs button{display:flex;align-items:center;justify-content:flex-start;text-align:start;width:100%;padding:11px 13px;border:0;border-radius:10px;color:var(--mut);font-weight:600;white-space:normal;transition:background .15s,color .15s}
+.settings-modal .tabs button:hover{background:var(--bg3);color:var(--tx)}
+.settings-modal .tabs button.on{background:color-mix(in srgb,var(--acc) 14%,var(--bg3));color:var(--acc)}
+.settings-modal .tab-body{min-width:0;max-width:620px;width:100%;padding:2px 4px 12px}
+.settings-modal .tab-body h4{font-size:15px;margin:18px 0 10px}
+.settings-modal .tab-body hr{border:0;border-top:1px solid var(--line);margin:20px 0}
+.settings-modal .field{display:flex;flex-direction:column;gap:8px;margin:15px 0}
+.settings-modal .field>span{font-size:13px;color:var(--mut);font-weight:650}
+.settings-modal .field input{min-height:46px;border-radius:11px}
+.settings-modal .row{padding:14px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;margin-bottom:18px}
+.settings-modal .seg{display:flex;gap:10px;max-width:420px}
+.settings-modal .seg button{flex:1;min-height:54px;border:1px solid var(--line);border-radius:12px;background:var(--bg2)}
+.settings-modal .seg button.on{border-color:var(--acc);background:color-mix(in srgb,var(--acc) 12%,var(--bg2));color:var(--acc)}
+.settings-modal .check{display:flex;align-items:center;gap:10px;padding:14px 12px;margin:8px 0;border:1px solid var(--line);border-radius:12px;background:var(--bg2)}
+.settings-modal .check input{width:18px;height:18px;accent-color:var(--acc)}
+.settings-modal .nava-select{margin-top:2px}
+.settings-modal .btn{border-radius:10px}
+@media(max-width:600px){
+ .settings-modal{width:96vw!important;min-height:0;max-height:96dvh}
+ .settings-modal>.modal-body{display:block;padding:12px}
+ .settings-modal .tabs{flex-direction:row;gap:4px;border:0;border-bottom:1px solid var(--line);padding:0 0 9px;margin-bottom:14px;overflow-x:auto}
+ .settings-modal .tabs button{width:auto;flex:none;padding:10px 12px}
+ .settings-modal .tab-body{max-width:none;padding:0 2px 10px}
+ .settings-modal .seg{max-width:none}
+}
