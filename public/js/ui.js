@@ -21,7 +21,7 @@ function userPanel() {
     <div class="user-panel"><button class="up-user" data-act="pres-menu">${avatar(S.me, 'av-m')}${dot(S.me.presence)}<span><b>${esc(S.me.display_name)}${vtick(S.me)}</b><small>${esc(S.me.status_text || PRESENCE_FA[S.me.presence])}</small></span></button>
     <button class="icon-btn${VM.muted ? ' off' : ''}" data-act="v-mute" title="میکروفون">${ico(VM.muted ? 'mic-off' : 'mic')}</button>
     <button class="icon-btn${VM.deafened ? ' off' : ''}" data-act="v-deaf" title="ناشنوا">${ico(VM.deafened ? 'headphones-off' : 'headphones')}</button>
-    <button class="icon-btn" data-act="settings" title="تنظیمات">⚙</button></div>`;
+    <button class="icon-btn" data-act="settings" title="تنظیمات">${ico('settings')}</button></div>`;
 }
 function renderSide() {
   const el = $('#side'); if (!S.me) return;
@@ -129,7 +129,7 @@ ACT['friend-send'] = guard(async () => { const i = $('#fr-name'); if (!i.value.t
 ACT.panel = el => setPanel(el.dataset.p);
 ACT['toggle-members'] = () => document.body.classList.toggle('no-members');
 ACT['cat-toggle'] = el => { const id = +el.dataset.id; collapsed.has(id) ? collapsed.delete(id) : collapsed.add(id); localStorage.setItem('nv_collapsed', JSON.stringify([...collapsed])); renderSide(); };
-ACT['pres-menu'] = el => pop(el, ['online', 'idle', 'dnd', 'offline'].map(p => `<button data-act="pres-set" data-p="${p}">${dot(p)} ${PRESENCE_FA[p]}</button>`).join('') + '<button data-act="settings">${ico('settings')} تنظیمات</button>', 'menu');
+ACT['pres-menu'] = el => pop(el, ['online', 'idle', 'dnd', 'offline'].map(p => `<button data-act="pres-set" data-p="${p}">${dot(p)} ${PRESENCE_FA[p]}</button>`).join('') + '<button data-act="settings">' + ico('settings') + ' تنظیمات</button>', 'menu');
 ACT['pres-set'] = guard(async el => { const r = await patch('/api/me', { presence: el.dataset.p }); S.me = r.user; cacheUser(r.user); renderSide(); });
 
 // ----- global listeners -----
