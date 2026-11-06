@@ -200,3 +200,16 @@ select.nava-native-select{position:absolute!important;width:1px!important;height
 .nava-select-option:hover,.nava-select-option.selected{background:var(--bg0)}
 .nava-select-option.selected{color:var(--acc);font-weight:700}
 .nava-select-check{color:var(--acc);font-weight:800}
+
+/* server discovery */
+.rail-btn.discover{color:var(--yel);font-size:18px}.rail-btn.discover svg{width:22px;height:22px}
+.discover-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.discover-card{min-width:0;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:14px}
+.discover-card-top{display:flex;align-items:center;gap:10px;min-width:0}
+.discover-icon{width:54px;height:54px;border-radius:14px;object-fit:cover;flex:none}
+.discover-icon.fallback{display:flex;align-items:center;justify-content:center;background:var(--bg4);font-size:22px;font-weight:700}
+.discover-info{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}.discover-info b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.discover-info small{font-size:12px}
+.discover-rank{width:26px;height:26px;border-radius:8px;background:var(--men);color:var(--acc);display:flex;align-items:center;justify-content:center;font-weight:700;flex:none}
+.discover-join{width:100%;display:flex;align-items:center;justify-content:center;gap:6px}.discover-join:disabled{opacity:.65;cursor:wait}
+.discover-empty{min-height:220px}
+@media(max-width:768px){.discover-grid{grid-template-columns:1fr}.discover-card{padding:12px}}
