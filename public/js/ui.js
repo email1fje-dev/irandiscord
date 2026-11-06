@@ -128,7 +128,13 @@ ACT.friends = () => { S.cur.view = 'friends'; S.cur.channelId = null; renderAll(
 ACT.ftab = el => { friendsTab = el.dataset.t; renderMain(); };
 ACT['friend-send'] = guard(async () => { const i = $('#fr-name'); if (!i.value.trim()) return; await post('/api/friends/request', { username: i.value }); i.value = ''; toast('درخواست ارسال شد'); await reloadSocial(); renderAll(); });
 ACT.panel = el => setPanel(el.dataset.p);
-ACT['mobile-nav'] = el => pop(el, '<button data-act="panel" data-p="nav">'+ico('menu')+' کانال‌ها</button><button data-act="panel" data-p="chat">'+ico('message')+' گفتگوها</button><button data-act="panel" data-p="members">'+ico('users')+' اعضا</button><button data-act="settings">'+ico('settings')+' تنظیمات</button>', 'menu');
+ACT['mobile-nav'] = el => {
+  const inServer = S.cur.mode === 'server' && !!curServer();
+  const items = inServer
+    ? '<button data-act="panel" data-p="nav">'+ico('menu')+' کانال‌های سرور</button><button data-act="panel" data-p="members">'+ico('users')+' اعضای سرور</button><button data-act="server-menu">'+ico('settings')+' تنظیمات سرور</button><button data-act="settings">'+ico('settings')+' تنظیمات حساب</button>'
+    : '<button data-act="panel" data-p="chat">'+ico('message')+' گفتگوها</button><button data-act="friends">'+ico('users')+' دوستان</button><button data-act="panel" data-p="members">'+ico('users')+' اعضای گفتگو</button><button data-act="settings">'+ico('settings')+' تنظیمات حساب</button>';
+  pop(el, items, 'menu');
+};
 ACT['toggle-members'] = () => document.body.classList.toggle('no-members');
 ACT['cat-toggle'] = el => { const id = +el.dataset.id; collapsed.has(id) ? collapsed.delete(id) : collapsed.add(id); localStorage.setItem('nv_collapsed', JSON.stringify([...collapsed])); renderSide(); };
 ACT['pres-menu'] = el => pop(el, ['online', 'idle', 'dnd', 'offline'].map(p => `<button data-act="pres-set" data-p="${p}">${dot(p)} ${PRESENCE_FA[p]}</button>`).join('') + '<button data-act="settings">' + ico('settings') + ' تنظیمات</button>', 'menu');
