@@ -20,7 +20,7 @@ function attHtml(a) {
   if (/^image\//.test(a.mime)) return `<img class="att-img" src="${u}" alt="${n}" data-act="lightbox" data-src="${u}" loading="lazy">`;
   if (/^video\//.test(a.mime)) return `<video class="att-vid" controls preload="metadata" src="${u}"></video>`;
   if (/^audio\//.test(a.mime)) return `<audio controls preload="none" src="${u}"></audio>`;
-  return `<a class="att-file" href="${u}" download="${n}" target="_blank" rel="noopener"><span>📄</span><b>${n}</b><small>${fmtSize(a.size)}</small></a>`;
+  return `<a class="att-file" href="${u}" download="${n}" target="_blank" rel="noopener"><span>${ico('file')}</span><b>${n}</b><small>${fmtSize(a.size)}</small></a>`;
 }
 function reactionsHtml(m) {
   return (m.reactions || []).slice().sort((a, b) => a.emoji.localeCompare(b.emoji)).map(r =>
@@ -41,7 +41,7 @@ function msgEl(m, prev) {
       ${(m.attachments || []).map(attHtml).join('')}
       <div class="reactions">${reactionsHtml(m)}</div>
     </div>
-    <div class="msg-tools"><button class="icon-btn" data-act="react-pick" data-id="${m.id}" title="واکنش">😊</button><button class="icon-btn" data-act="msgmenu" data-id="${m.id}" title="بیشتر">⋯</button></div>
+    <div class="msg-tools"><button class="icon-btn" data-act="react-pick" data-id="${m.id}" title="واکنش">${ico('message')}</button><button class="icon-btn" data-act="msgmenu" data-id="${m.id}" title="بیشتر">⋯</button></div>
   </article>`;
 }
 function renderMsgList(mode) {
@@ -143,16 +143,16 @@ function chatViewHtml(ch, title, isDm) {
   else composer = `<div id="typing" class="typing"></div>
     <div id="reply-bar" class="reply-bar" hidden></div><div id="att-bar" class="att-bar"></div>
     <div class="composer"><div id="mention-pop" class="mention-pop" hidden></div>
-      <button class="icon-btn" data-act="attach" title="افزودن فایل">📎</button><input type="file" id="file-in" multiple hidden>
+      <button class="icon-btn" data-act="attach" title="افزودن فایل">${ico('paperclip')}</button><input type="file" id="file-in" multiple hidden>
       <textarea id="msg-in" rows="1" maxlength="4000" placeholder="پیام خود را بنویسید…"></textarea>
-      <button class="icon-btn" data-act="emoji-compose" title="ایموجی">😊</button>
+      
       <button class="send" data-act="send" title="ارسال">➤</button></div>`;
   return `<header class="main-head"><button class="icon-btn only-mobile" data-act="panel" data-p="nav">☰</button>
     <h2>${isDm ? '' : '<span class="hash">#</span>'}${esc(title)}</h2><div class="grow"></div>
     <div class="search-box" hidden><input id="search-in" type="search" placeholder="جستجو در پیام‌ها…"></div>
-    <button class="icon-btn" data-act="search-toggle" title="جستجو">🔍</button>
-    <button class="icon-btn" data-act="pins" title="پیام‌های پین‌شده">📌</button>
-    <button class="icon-btn only-desktop" data-act="toggle-members" title="اعضا">👥</button></header>
+    <button class="icon-btn" data-act="search-toggle" title="جستجو">${ico('search')}</button>
+    <button class="icon-btn" data-act="pins" title="پیام‌های پین‌شده">${ico('pin')}</button>
+    <button class="icon-btn only-desktop" data-act="toggle-members" title="اعضا">${ico('users')}</button></header>
     <div id="msgs" class="msgs"></div>${composer}`;
 }
 function mountChat(cid) {
@@ -188,7 +188,7 @@ function renderReplyBar() {
 }
 function renderAtt() {
   const c = chatOf(S.cur.channelId), el = $('#att-bar'); if (!el) return;
-  el.innerHTML = c.attachments.map((a, i) => `<span class="chip">${/^image\//.test(a.mime) ? `<img src="${esc(a.url)}" alt="">` : '📄'}<b>${esc(a.name)}</b><button data-act="att-del" data-i="${i}">✕</button></span>`).join('') +
+  el.innerHTML = c.attachments.map((a, i) => `<span class="chip">${/^image\//.test(a.mime) ? `<img src="${esc(a.url)}" alt="">` : ico('file')}<b>${esc(a.name)}</b><button data-act="att-del" data-i="${i}">✕</button></span>`).join('') +
     (c.uploading ? `<span class="chip">⏳ در حال بارگذاری (${fa(c.uploading)})</span>` : '');
 }
 async function attachFiles(files) {
@@ -240,16 +240,16 @@ ACT.send = () => sendMessage();
 ACT.attach = () => $('#file-in') && $('#file-in').click();
 ACT['att-del'] = el => { chatOf(S.cur.channelId).attachments.splice(+el.dataset.i, 1); renderAtt(); };
 ACT['reply-cancel'] = () => { chatOf(S.cur.channelId).reply = null; renderReplyBar(); };
-ACT['emoji-compose'] = el => pop(el, `<div class="emoji-grid">${EMOJIS.map(e => `<button data-act="emoji-ins" data-keep data-e="${e}">${e}</button>`).join('')}</div>`);
-ACT['emoji-ins'] = el => { const ta = $('#msg-in'); if (!ta) return; ta.setRangeText(el.dataset.e, ta.selectionStart, ta.selectionEnd, 'end'); chatOf(S.cur.channelId).draft = ta.value; ta.focus(); };
-ACT['react-pick'] = el => pop(el, `<div class="emoji-grid">${EMOJIS.map(e => `<button data-act="react" data-id="${el.dataset.id}" data-emoji="${e}">${e}</button>`).join('')}</div>`);
+ACT['emoji-compose'] = () => {};
+ACT['emoji-ins'] = () => {};
+ACT['react-pick'] = () => {};
 ACT.react = guard(async el => { const r = await ack('msg:react', { id: +el.dataset.id, emoji: el.dataset.emoji }); if (!r.ok) toast(r.error, 'err'); });
 ACT.msgmenu = el => {
   const m = findMsg(+el.dataset.id); if (!m) return;
   const mine = m.author_id === S.me.id, mod = S.cur.mode === 'server' ? can(S.cfg.perms.MANAGE_MESSAGES) : true;
   const b = (a, t, cls = '') => `<button class="${cls}" data-act="${a}" data-id="${m.id}">${t}</button>`;
   pop(el, b('reply', '↩ پاسخ') + (m.content ? b('copy', '⧉ کپی متن') : '') + (mine ? b('edit', '✎ ویرایش') : '') +
-    (mod ? b('pin', m.pinned ? '📌 برداشتن پین' : '📌 پین کردن') : '') + (mine || (S.cur.mode === 'server' && mod) ? b('delmsg', '🗑 حذف', 'danger') : ''), 'menu');
+    (mod ? b('pin', m.pinned ? ico('pin') + ' برداشتن پین' : ico('pin') + ' پین کردن') : '') + (mine || (S.cur.mode === 'server' && mod) ? b('delmsg', ico('trash') + ' حذف', 'danger') : ''), 'menu');
 };
 ACT.reply = el => { const m = findMsg(+el.dataset.id); if (!m) return; chatOf(S.cur.channelId).reply = { id: m.id, name: nameOf(m.author_id) || m.author.display_name, content: (m.content || '📎').replace(/<@\d+>/g, '@').slice(0, 80) }; renderReplyBar(); const ta = $('#msg-in'); ta && ta.focus(); };
 ACT.copy = el => { const m = findMsg(+el.dataset.id); navigator.clipboard && navigator.clipboard.writeText(m.content).then(() => toast('کپی شد')); };
