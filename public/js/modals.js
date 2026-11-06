@@ -31,7 +31,7 @@ ACT.settings = () => {
       <button class="btn primary" data-act="acc-save">ذخیره</button><hr>
       <h4>تغییر گذرواژه</h4>${field('گذرواژه فعلی', '<input id="s-pw0" type="password" autocomplete="current-password">')}${field('گذرواژه جدید', '<input id="s-pw1" type="password" autocomplete="new-password">')}
       <button class="btn" data-act="pw-save">تغییر گذرواژه</button><hr>
-      ${S.me.is_admin ? '<button class="btn" data-act="admin">${ico('shield')} پنل مدیریت سایت</button> ' : ''}<button class="btn danger" data-act="logout">خروج از حساب</button>` },
+      ${S.me.is_admin ? `<button class="btn" data-act="admin">${ico('shield')} پنل مدیریت سایت</button> ` : ''}<button class="btn danger" data-act="logout">خروج از حساب</button>` },
     { id: 'look', label: 'ظاهر', html: () => `<div class="seg">${[['dark', ico('moon') + ' تیره'], ['light', ico('sun') + ' روشن']].map(([k, t]) => `<button class="${prefs.theme === k ? 'on' : ''}" data-act="theme" data-t="${k}">${t}</button>`).join('')}</div>` },
     { id: 'notif', label: 'اعلان‌ها', html: () => `
       <label class="check"><input type="checkbox" data-change="pref-sound" ${prefs.sound ? 'checked' : ''}> صدای پیام‌های جدید</label>
@@ -89,7 +89,7 @@ ACT['copy-link'] = () => { const i = $('#inv-link'); i.select(); (navigator.clip
 ACT['server-menu'] = el => {
   const sv = curServer(), p = S.cfg.perms, has = b => sv.perms & b;
   const b = (a, t, c = '') => `<button class="${c}" data-act="${a}">${t}</button>`;
-  pop(el, b('invite', '➕ دعوت دوستان') + (has(p.MANAGE_SERVER | p.MANAGE_CHANNELS | p.MANAGE_ROLES | p.BAN) ? b('server-settings', '⚙ تنظیمات سرور') : '') +
+  pop(el, b('invite', ico('plus') + ' دعوت دوستان') + (has(p.MANAGE_SERVER | p.MANAGE_CHANNELS | p.MANAGE_ROLES | p.BAN) ? b('server-settings', ico('settings') + ' تنظیمات سرور') : '') +
     (has(p.MANAGE_CHANNELS) ? b('ch-new', '＃ ساخت کانال') + b('cat-new', ico('folder') + ' ساخت دسته‌بندی') : '') +
     (sv.owner ? b('server-delete', ico('trash') + ' حذف سرور', 'danger') : b('server-leave', ico('door') + ' ترک سرور', 'danger')), 'menu');
 };
@@ -131,7 +131,7 @@ function channelsTab() {
   const chs = curServer().channels, cats = chs.filter(c => c.type === 'category');
   const row = (c, ic) => `<div class="list-row"><span>${ic} ${esc(c.name)}</span><span class="grow"></span>
     <button class="icon-btn" data-act="ch-move" data-id="${c.id}" data-d="-1">▲</button><button class="icon-btn" data-act="ch-move" data-id="${c.id}" data-d="1">▼</button>
-    <button class="icon-btn" data-act="ch-rename" data-id="${c.id}">✎</button><button class="icon-btn" data-act="ch-del" data-id="${c.id}">🗑</button></div>`;
+    <button class="icon-btn" data-act="ch-rename" data-id="${c.id}">✎</button><button class="icon-btn" data-act="ch-del" data-id="${c.id}">${ico('trash')}</button></div>`;
   const groups = [...cats.map(c => ({ cat: c, kids: chs.filter(x => x.parent_id === c.id) })), { cat: null, kids: chs.filter(x => x.type !== 'category' && !x.parent_id) }];
   return `<div class="row"><button class="btn" data-act="ch-new">＋ کانال</button><button class="btn" data-act="cat-new">＋ دسته‌بندی</button></div>` +
     groups.map(g => (g.cat ? row(g.cat, ico('folder')) : (g.kids.length ? '<div class="muted">بدون دسته</div>' : '')) + `<div class="indent">${g.kids.map(k => row(k, k.type === 'voice' ? ico('volume') : '#')).join('')}</div>`).join('');
@@ -260,7 +260,7 @@ ACT['adm-user'] = el => {
   modal(u.display_name, `<div class="profile">${avatar(u, 'av-xl')}<div><h3>${esc(u.display_name)}${vtick(u)}</h3><div class="muted">@${esc(u.username)}</div>${u.created_at ? `<div class="muted">عضویت: ${esc(jDate(u.created_at))}</div>` : ''}</div></div><hr>
     <div class="admin-actions">${b('adm-tick', u.verified ? 'برداشتن تیک آبی' : '✔ دادن تیک آبی', u.verified ? '' : 'primary')}${b('adm-rename', '✎ ویرایش نام / پاک کردن وضعیت')}
     ${b('adm-pass', ico('key') + ' ریست گذرواژه')}${b('adm-logout', '⎋ خروج اجباری')}
-    ${root ? '' : b('adm-purge', ico('broom') + ' حذف همهٔ پیام‌ها', 'ghost')}${!root && me.is_root ? b('adm-admin', u.is_admin ? 'گرفتن دسترسی مدیریت' : '🛡 دادن دسترسی مدیریت') : ''}
+    ${root ? '' : b('adm-purge', ico('broom') + ' حذف همهٔ پیام‌ها', 'ghost')}${!root && me.is_root ? b('adm-admin', u.is_admin ? 'گرفتن دسترسی مدیریت' : ico('shield') + ' دادن دسترسی مدیریت') : ''}
     ${root || u.is_admin ? '' : b('adm-ban', u.banned ? 'رفع مسدودی' : ico('ban') + ' مسدود کردن', u.banned ? '' : 'danger')}${root || u.is_admin ? '' : b('adm-user-del', ico('trash') + ' حذف حساب', 'danger')}</div>`);
 };
 const admDo = fn => guard(async el => { const r = await fn(el, adm.users.find(x => x.id === +el.dataset.id) || adm.online.find(x => x.id === +el.dataset.id)); if (r === false) return; const m = el.closest('.modal-back'); if (m) m.close(); await admLoad(); toast('انجام شد'); });
