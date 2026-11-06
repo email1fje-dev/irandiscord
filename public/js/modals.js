@@ -39,7 +39,7 @@ ACT.settings = () => {
       <p class="muted">در حالت «مزاحم نشوید» هیچ صدا یا اعلانی پخش نمی‌شود.</p>` },
     { id: 'voice', label: 'صدا و تصویر', html: () => `${field('میکروفون', '<select id="d-mic"><option value="">پیش‌فرض</option></select>')}${field('خروجی صدا', '<select id="d-spk"><option value="">پیش‌فرض</option></select>')}${field('دوربین', '<select id="d-cam"><option value="">پیش‌فرض</option></select>')}
       <button class="btn" data-act="dev-perm">اجازه دسترسی به دستگاه‌ها</button><p class="muted">تغییر دستگاه از اتصال بعدی اعمال می‌شود.</p>`,
-      mount: fillDevices }]);
+      mount: fillDevices }], { cls: 'wide settings-modal' });
 };
 async function fillDevices() {
   if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
