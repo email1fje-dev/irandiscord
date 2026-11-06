@@ -74,13 +74,15 @@ ACT['server-discover'] = guard(async () => {
   const r = await get('/api/servers/discover');
   if (!m.isConnected) return;
   const list = r.servers || [];
-  m.querySelector('.modal-body').innerHTML = list.length ? '<div class="discover-grid">' + list.map((s, i) =>
-    '<article class="discover-card"><div class="discover-card-top">' +
-    (s.icon ? '<img class="discover-icon" src="' + esc(s.icon) + '" alt="">' : '<div class="discover-icon fallback">' + esc(Array.from(s.name)[0] || '?') + '</div>') +
-    '<div class="discover-info"><b>' + esc(s.name) + (s.verified ? ' ' + vtick(s) : '') + '</b><small>' + fa(s.member_count) + ' عضو · ' + fa(s.online_count) + ' آنلاین</small></div>' +
-    (i < 3 ? '<span class="discover-rank">' + fa(i + 1) + '</span>' : '') + '</div>' +
-    '<button class="btn primary discover-join" data-act="discover-join" data-id="' + s.id + '">' + ico('plus') + ' پیوستن به سرور</button></article>'
-  ).join('') + '</div>' : '<div class="empty discover-empty">' + ico('users') + '<p>فعلاً سرور عمومی‌ای برای نمایش وجود ندارد.</p><small>بعداً دوباره سر بزن.</small></div>';
+  m.querySelector('.modal-body').innerHTML = '<div class="discover-intro"><h2>سرورهای برتر</h2><p>جامعه‌های جذاب Nava را پیدا کن و قبل از عضویت پیش‌نمایششان را ببین.</p></div>' + (list.length ? '<div class="discover-grid">' + list.map((s, i) =>
+    '<article class="discover-card"><div class="discover-banner banner-' + (i % 5) + '">' + (s.icon ? '<img class="discover-logo" src="' + esc(s.icon) + '" alt="لوگوی ' + esc(s.name) + '">' : '<div class="discover-logo fallback">' + esc(Array.from(s.name)[0] || '?') + '</div>') + '</div><div class="discover-card-content"><div class="discover-title-row"><h3>' + esc(s.name) + (s.verified ? ' ' + vtick(s) : '') + '</h3>' + (i < 3 ? '<span class="discover-rank">#' + fa(i + 1) + '</span>' : '') + '</div><div class="discover-stats"><span>' + ico('activity') + fa(s.online_count) + ' آنلاین</span><span>' + ico('users') + fa(s.member_count) + ' عضو</span></div><button class="btn primary discover-preview" data-act="discover-preview" data-id="' + s.id + '">' + ico('eye') + ' پیش‌نمایش</button></div></article>'
+  ).join('') + '</div>' : '<div class="empty discover-empty">' + ico('users') + '<p>فعلاً سرور عمومی‌ای برای نمایش وجود ندارد.</p></div>');
+});
+ACT['discover-preview'] = guard(async el => {
+  const id = +el.dataset.id, r = await get('/api/servers/discover');
+  const s = (r.servers || []).find(x => x.id === id);
+  if (!s) return toast('این سرور دیگر در دسترس نیست');
+  modal('پیش‌نمایش سرور', '<div class="discover-preview-panel"><div class="discover-banner banner-preview">' + (s.icon ? '<img class="discover-logo" src="' + esc(s.icon) + '" alt="">' : '<div class="discover-logo fallback">' + esc(Array.from(s.name)[0] || '?') + '</div>') + '</div><h2>' + esc(s.name) + (s.verified ? ' ' + vtick(s) : '') + '</h2><div class="discover-stats"><span>' + ico('activity') + fa(s.online_count) + ' آنلاین</span><span>' + ico('users') + fa(s.member_count) + ' عضو</span></div><p class="muted">برای ورود به این جامعه، روی دکمهٔ پیوستن بزن.</p><button class="btn primary discover-preview-join" data-act="discover-join" data-id="' + s.id + '">' + ico('plus') + ' پیوستن به سرور</button></div>', { cls: 'wide' });
 });
 ACT['discover-join'] = guard(async el => {
   const id = +el.dataset.id;
