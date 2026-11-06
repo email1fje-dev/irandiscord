@@ -47,6 +47,7 @@ async function fillDevices() {
   [['d-mic', 'audioinput', 'mic'], ['d-spk', 'audiooutput', 'spk'], ['d-cam', 'videoinput', 'cam']].forEach(([id, kind, key]) => {
     const sel = $('#' + id); if (!sel) return;
     devs.filter(d => d.kind === kind).forEach((d, i) => sel.insertAdjacentHTML('beforeend', `<option value="${esc(d.deviceId)}" ${prefs[key] === d.deviceId ? 'selected' : ''}>${esc(d.label || 'دستگاه ' + fa(i + 1))}</option>`));
+    refreshCustomSelect(sel);
     sel.onchange = () => { prefs[key] = sel.value; savePrefs(); };
   });
 }
