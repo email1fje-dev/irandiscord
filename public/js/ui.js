@@ -44,10 +44,10 @@ function renderSide() {
       loose.map(item).join('') +
       cats.map(cat => `<div class="cat"><div class="cat-head"><button data-act="cat-toggle" data-id="${cat.id}">${collapsed.has(cat.id) ? '◂' : '▾'} ${esc(cat.name)}</button>${mg ? `<button class="icon-btn" data-act="ch-new" data-parent="${cat.id}" title="کانال جدید">＋</button>` : ''}</div>${collapsed.has(cat.id) ? '' : chs.filter(c => c.parent_id === cat.id).map(item).join('')}</div>`).join('') + '</div>';
   } else {
-    body = `<div class="side-head static"><b>پیام‌ها</b></div><div class="side-scroll"><button class="ch${S.cur.view === 'friends' ? ' on' : ''}" data-act="friends"">${ico('users')} <span>دوستان</span>${S.social.incoming.length ? badge(0, S.social.incoming.length) : ''}</button>
+    body = `<div class="side-head static"><b>پیام‌ها</b></div><div class="side-scroll"><button class="ch${S.cur.view === 'friends' ? ' on' : ''}" data-act="friends">${ico('users')} <span>دوستان</span>${S.social.incoming.length ? badge(0, S.social.incoming.length) : ''}</button>
       <div class="cat-head"><span class="muted">پیام‌های مستقیم</span><button class="icon-btn" data-act="group-new" title="گروه جدید">＋</button></div>` +
       S.dms.map(d => { const u = S.unread[d.id], o = d.type === 'dm' ? d.members.find(m => m.id !== S.me.id) : null;
-        return `<button class="ch dm${S.cur.channelId === d.id ? ' on' : ''}${u ? ' unread' : ''}" data-act="dm" data-id="${d.id}">${o ? avatar(o, 'av-s') + dot(o.presence) : '<span class="av av-s grp">👥</span>'}<span>${esc(dmTitle(d))}${o ? vtick(o) : ''}</span>${u ? badge(u.count, u.mentions) : ''}</button>`; }).join('') + '</div>';
+        return `<button class="ch dm${S.cur.channelId === d.id ? ' on' : ''}${u ? ' unread' : ''}" data-act="dm" data-id="${d.id}">${o ? avatar(o, 'av-s') + dot(o.presence) : '<span class="av av-s grp">' + ico('users') + '</span>'}<span>${esc(dmTitle(d))}${o ? vtick(o) : ''}</span>${u ? badge(u.count, u.mentions) : ''}</button>`; }).join('') + '</div>';
   }
   el.innerHTML = body + userPanel();
 }
@@ -129,7 +129,7 @@ ACT['friend-send'] = guard(async () => { const i = $('#fr-name'); if (!i.value.t
 ACT.panel = el => setPanel(el.dataset.p);
 ACT['toggle-members'] = () => document.body.classList.toggle('no-members');
 ACT['cat-toggle'] = el => { const id = +el.dataset.id; collapsed.has(id) ? collapsed.delete(id) : collapsed.add(id); localStorage.setItem('nv_collapsed', JSON.stringify([...collapsed])); renderSide(); };
-ACT['pres-menu'] = el => pop(el, ['online', 'idle', 'dnd', 'offline'].map(p => `<button data-act="pres-set" data-p="${p}">${dot(p)} ${PRESENCE_FA[p]}</button>`).join('') + '<button data-act="settings">⚙ تنظیمات</button>', 'menu');
+ACT['pres-menu'] = el => pop(el, ['online', 'idle', 'dnd', 'offline'].map(p => `<button data-act="pres-set" data-p="${p}">${dot(p)} ${PRESENCE_FA[p]}</button>`).join('') + '<button data-act="settings">${ico('settings')} تنظیمات</button>', 'menu');
 ACT['pres-set'] = guard(async el => { const r = await patch('/api/me', { presence: el.dataset.p }); S.me = r.user; cacheUser(r.user); renderSide(); });
 
 // ----- global listeners -----
