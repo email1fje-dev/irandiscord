@@ -5,6 +5,7 @@ const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const FA_DIGITS = '۰۱۲۳۴۵۶۷۸۹';
 const fa = n => String(n).replace(/\d/g, d => FA_DIGITS[d]);
+const ico = n => '<svg class="ui-icon" aria-hidden="true"><use href="#icon-' + n + '"></use></svg>';
 
 // ---------- Jalali (Shamsi) calendar: self-contained Gregorian -> Jalali converter ----------
 function g2j(gy, gm, gd) {
@@ -53,7 +54,7 @@ function md(text, ctx = {}) {
   return s.replace(/\u0000(\d+)\u0000/g, (m, i) => stash[i]);
 }
 
-const EMOJIS = ('😀 😁 😂 🤣 😊 😍 😘 😎 🤔 😅 😭 😡 🥳 😴 🤯 🙄 👍 👎 👏 🙏 💪 👀 🔥 ✨ 🎉 ❤️ 💔 💯 ✅ ❌ ⭐ 🌹 ☕ 🍉 🎵 🎮 💻 📌 🚀 🌙 ☀️ 🌈 🐱 🐶 🍕 ⚽ 🎁 😇 🤝 😢').split(' ');
+const EMOJIS = []; // Emoji picker disabled; interface controls use SVG icons.
 
 // ---------- avatars / presence ----------
 const hue = id => (Number(id) * 47) % 360;
